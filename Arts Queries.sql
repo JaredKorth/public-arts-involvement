@@ -362,10 +362,14 @@ though general marketing for the 11% of much larger communities would still brin
 
 
 -- Q: Is there a relationship between income levels and repeat patronage of an art?
-SELECT Family_Income, 
-	COUNT(*) AS respondents_in_bracket,
-	SUM(num_repeats) AS repeats_per_bracket,
-	ROUND(CAST(SUM(num_repeats) AS FLOAT)/COUNT(*), 2) AS average_repeats
+SELECT Family_Income AS 'family income', 
+	COUNT(*) AS 'respondents in bracket',
+	SUM(num_events) AS 'events attended',
+	ROUND(CAST(SUM(num_events) AS FLOAT)/COUNT(*), 2) AS 'average # events',
+	SUM(CASE WHEN num_repeats > 0 THEN 1 ELSE 0 END) AS '# who repeat any',
+	ROUND(CAST(SUM(CASE WHEN num_repeats > 0 THEN 1 ELSE 0 END) AS FLOAT)/COUNT(*), 2) * 100 AS '% who repeat any',
+    SUM(CASE WHEN num_repeats > 1 THEN 1 ELSE 0 END) AS '# who repeat multiple',
+	ROUND(CAST(SUM(CASE WHEN num_repeats > 1 THEN 1 ELSE 0 END) AS FLOAT)/COUNT(*), 2) * 100 AS '% who repeat multiple'
 FROM arts
 CROSS APPLY
 	(SELECT (
@@ -379,7 +383,19 @@ CROSS APPLY
 		+ CASE WHEN num_Dance > 1 THEN 1 ELSE 0 END
 		+ CASE WHEN num_Other_Theater > 1 THEN 1 ELSE 0 END
 		+ CASE WHEN num_Gallery > 1 THEN 1 ELSE 0 END
-		) AS num_repeats
+		) AS num_repeats,
+		(
+		ISNULL(num_Ballet, 0) 
+		+ ISNULL(num_Classical, 0) 
+		+ ISNULL(num_Dance, 0) 
+		+ ISNULL(num_Gallery, 0) 
+		+ ISNULL(num_Jazz, 0) 
+		+ ISNULL(num_Latin, 0) 
+		+ ISNULL(num_Musicals, 0)
+		+ ISNULL(num_Opera, 0) 
+		+ ISNULL(num_Other_Theater, 0) 
+		+ ISNULL(num_Plays, 0)
+		) AS num_events
 	) AS n
 GROUP BY Family_Income
 ORDER BY CASE Family_Income
@@ -390,12 +406,12 @@ ORDER BY CASE Family_Income
 	WHEN '60,000-99,999' THEN 5
 	WHEN '>100,000' THEN 6
 	END;
-/* A: Of the respondents who attended any sort of artistic event, just over 50% attended at least 
-one type of event multiple times. Stated differently, the average respondent attended .5 event types
-multiple times. There was no significant change to this between income brackets.
+/* A: Of the respondents who attended any sort of artistic event, just under 50% attended at least 
+one type of event multiple times.There was no significant change to this between income brackets.
 	Going further, many respondents attended multiple types of events multiple times. Accounting for this,
-the numbers do rise significantly through the income brackets, with respondents who earn over 
-$100,000/yr attending an average of .82 repeat events.
+the numbers do rise significantly through the income brackets. The lowest income brackets returned
+a 5-6% likelihood of repeating multiple event types, while the highest bracket showed 18%.
 	Therefore, not only should it be beneficial to advertise one event at another similar event,
 it may even be an ideal option for premium events to reach higher income attendants who are 
-very likely to attend more events and be able to afford higher prices. */
+very likely to attend more events of more types, and be able to afford higher prices. */
+
