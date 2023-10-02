@@ -8,6 +8,9 @@ Most queries I used in the process are here, including some data preparation. Th
 
 Each question (e.g., "Do singers attend more musical theater than non-singers?") is followed by the query, then a description of the results with a possible practical application of that knowledge.
 
+An series of accompanying visualizations are available at
+https://public.tableau.com/views/MarketingtheArtsinBarCharts/Story1
+
 Here's to the data-aided advancement of the arts in society!
 
 CREDITS
